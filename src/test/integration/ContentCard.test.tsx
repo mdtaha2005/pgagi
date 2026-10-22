@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -30,15 +31,15 @@ function renderWithStore(ui: React.ReactElement, preloadedFavorites: ContentItem
     preloadedState: {
       favorites: {
         items: preloadedFavorites,
-        filter: 'all',
+        filter: 'all' as const,
         searchQuery: '',
       },
       preferences: {
-        selectedCategories: ['technology'],
+        selectedCategories: ['technology' as const],
         realTimeEnabled: true,
         realTimeIntervalSeconds: 15,
-        density: 'comfortable',
-        language: 'en',
+        density: 'comfortable' as const,
+        language: 'en' as const,
       },
     },
   });
@@ -90,7 +91,6 @@ describe('ContentCard Component Integration', () => {
     const likeBtn = screen.getByLabelText('Like content');
     fireEvent.click(likeBtn);
 
-    // Toast message is triggered
     expect(store.getState().ui.toastMessage).toBeNull();
   });
 
