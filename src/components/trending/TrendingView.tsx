@@ -2,11 +2,8 @@
 
 import React, { useEffect } from 'react';
 import {
-  TrendingUp,
   Flame,
   Award,
-  Sparkles,
-  Layers,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -20,7 +17,7 @@ import { I18N_STRINGS } from '@/utils/formatters';
 
 export function TrendingView() {
   const dispatch = useAppDispatch();
-  const { items, status, error, selectedCategory } = useAppSelector(
+  const { items, status, selectedCategory } = useAppSelector(
     (state) => state.trending
   );
   const language = useAppSelector((state) => state.preferences.language);

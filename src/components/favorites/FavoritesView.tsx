@@ -7,7 +7,6 @@ import {
   Trash2,
   Download,
   Compass,
-  Filter,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -17,7 +16,6 @@ import {
 } from '@/store/slices/favoritesSlice';
 import { setActiveSection, showToast } from '@/store/slices/uiSlice';
 import { ContentCard } from '../feed/ContentCard';
-import { ContentType } from '@/types/content';
 import { I18N_STRINGS } from '@/utils/formatters';
 
 export function FavoritesView() {

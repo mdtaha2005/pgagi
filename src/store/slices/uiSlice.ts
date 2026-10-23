@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ContentItem } from '@/types/content';
-import { loadFromLocalStorage, saveToLocalStorage, STORAGE_KEYS } from '../localStorage';
+import { likeItem } from '../sharedActions';
 
 export type DashboardSection = 'feed' | 'trending' | 'favorites' | 'settings';
 export type AppTheme = 'light' | 'dark' | 'system';
@@ -31,56 +31,14 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    hydrateTheme: (state) => {
-      const persisted = loadFromLocalStorage<AppTheme>(STORAGE_KEYS.THEME, 'dark');
-      state.theme = persisted;
-      if (typeof document !== 'undefined') {
-        const root = document.documentElement;
-        if (persisted === 'dark') {
-          root.classList.add('dark');
-        } else if (persisted === 'light') {
-          root.classList.remove('dark');
-        } else {
-          // system
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (prefersDark) {
-            root.classList.add('dark');
-          } else {
-            root.classList.remove('dark');
-          }
-        }
-      }
+    hydrateTheme: (state, action: PayloadAction<AppTheme>) => {
+      state.theme = action.payload;
     },
     setTheme: (state, action: PayloadAction<AppTheme>) => {
       state.theme = action.payload;
-      saveToLocalStorage(STORAGE_KEYS.THEME, action.payload);
-      if (typeof document !== 'undefined') {
-        const root = document.documentElement;
-        if (action.payload === 'dark') {
-          root.classList.add('dark');
-        } else if (action.payload === 'light') {
-          root.classList.remove('dark');
-        } else {
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (prefersDark) {
-            root.classList.add('dark');
-          } else {
-            root.classList.remove('dark');
-          }
-        }
-      }
     },
     toggleTheme: (state) => {
-      const nextTheme: AppTheme = state.theme === 'dark' ? 'light' : 'dark';
-      state.theme = nextTheme;
-      saveToLocalStorage(STORAGE_KEYS.THEME, nextTheme);
-      if (typeof document !== 'undefined') {
-        if (nextTheme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
     },
     setActiveSection: (state, action: PayloadAction<DashboardSection>) => {
       state.activeSection = action.payload;
@@ -116,6 +74,29 @@ export const uiSlice = createSlice({
     clearToast: (state) => {
       state.toastMessage = null;
     },
+  },
+  extraReducers: (builder) => {
+    // If modal is currently open and item is liked, update its like state
+    builder.addCase(likeItem, (state, action) => {
+      if (state.activeItemModal && state.activeItemModal.id === action.payload) {
+        const item = state.activeItemModal;
+        const wasLiked = Boolean(item.isLiked || item.socialMeta?.isLiked);
+        const nextLiked = !wasLiked;
+        item.isLiked = nextLiked;
+
+        if (item.socialMeta) {
+          item.socialMeta.isLiked = nextLiked;
+          item.socialMeta.likesCount = nextLiked
+            ? (item.socialMeta.likesCount || 0) + 1
+            : Math.max(0, (item.socialMeta.likesCount || 1) - 1);
+        } else {
+          if (!item.metrics) item.metrics = { likes: 0 };
+          item.metrics.likes = nextLiked
+            ? (item.metrics.likes || 0) + 1
+            : Math.max(0, (item.metrics.likes || 1) - 1);
+        }
+      }
+    });
   },
 });
 

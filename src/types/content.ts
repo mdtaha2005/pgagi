@@ -8,6 +8,8 @@ export type ContentCategory =
 
 export type ContentType = 'news' | 'recommendation' | 'social';
 
+export type ContentSourceType = 'live' | 'curated' | 'mock';
+
 export interface Author {
   name: string;
   handle?: string;
@@ -17,7 +19,7 @@ export interface Author {
 
 export interface RecommendationMeta {
   mediaType: 'movie' | 'music' | 'podcast' | 'series';
-  rating: number; // e.g. 8.4
+  rating: number;
   year: number;
   duration?: string;
   directorOrArtist?: string;
@@ -33,6 +35,14 @@ export interface SocialMeta {
   isLiked?: boolean;
 }
 
+export interface ContentSource {
+  id?: string;
+  name: string;
+  avatarUrl?: string;
+  isMock?: boolean;
+  sourceType?: ContentSourceType;
+}
+
 export interface ContentItem {
   id: string;
   type: ContentType;
@@ -43,11 +53,7 @@ export interface ContentItem {
   url: string;
   imageUrl?: string;
   publishedAt: string;
-  source: {
-    id?: string;
-    name: string;
-    avatarUrl?: string;
-  };
+  source: ContentSource;
   metrics?: {
     likes?: number;
     views?: number;
@@ -61,4 +67,5 @@ export interface ContentItem {
   socialMeta?: SocialMeta;
   isTrending?: boolean;
   trendingRank?: number;
+  isLiked?: boolean;
 }

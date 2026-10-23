@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { DragControls } from 'framer-motion';
 import {
   Heart,
   Bookmark,
@@ -10,15 +11,15 @@ import {
   Star,
   GripVertical,
   Clock,
-  CheckCircle2,
   MessageCircle,
   Repeat2,
   Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { ContentItem } from '@/types/content';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toggleFavorite } from '@/store/slices/favoritesSlice';
-import { likeItem } from '@/store/slices/feedSlice';
+import { likeItem } from '@/store/sharedActions';
 import { setActiveItemModal, showToast } from '@/store/slices/uiSlice';
 import {
   formatRelativeTime,
@@ -29,8 +30,8 @@ import {
 
 interface ContentCardProps {
   item: ContentItem;
-  dragControls?: any;
-  dragHandleProps?: Record<string, any>;
+  dragControls?: DragControls;
+  dragHandleProps?: Record<string, unknown>;
   isDragging?: boolean;
 }
 
@@ -84,7 +85,14 @@ export function ContentCard({
   return (
     <article
       onClick={handleOpenDetail}
-      className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden ${
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          handleOpenDetail();
+        }
+      }}
+      tabIndex={0}
+      role="article"
+      className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
         isDragging
           ? 'shadow-2xl scale-[1.02] border-indigo-500 ring-2 ring-indigo-500/30 bg-slate-900 z-50'
           : 'bg-white dark:bg-[#111827] border-slate-200/90 dark:border-slate-800/90 hover:border-indigo-500/50 hover:shadow-xl dark:hover:shadow-indigo-500/10 hover:-translate-y-0.5'
@@ -132,6 +140,15 @@ export function ContentCard({
 
           {/* Badges on Top Right */}
           <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5 z-10">
+            {item.source.sourceType === 'live' ? (
+              <span className="flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-md">
+                ● Live API
+              </span>
+            ) : item.source.sourceType === 'mock' ? (
+              <span className="rounded-full bg-slate-900/80 border border-slate-600/50 px-2 py-0.5 text-[10px] font-medium text-slate-300 backdrop-blur-md">
+                Mock
+              </span>
+            ) : null}
             {item.trendingRank && (
               <span className="flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
                 🔥 #{item.trendingRank}
@@ -262,7 +279,7 @@ export function ContentCard({
             >
               <Heart
                 className={`h-4 w-4 transition-transform active:scale-125 ${
-                  item.socialMeta?.isLiked
+                  item.isLiked || item.socialMeta?.isLiked
                     ? 'fill-rose-500 text-rose-500'
                     : 'text-slate-400 hover:text-rose-500'
                 }`}
@@ -314,18 +331,37 @@ export function ContentCard({
               <Share2 className="h-4 w-4" />
             </button>
 
-            {/* External Direct Link */}
+            {/* External Direct CTA Link */}
             {item.url && (
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-indigo-500"
-                title={t.readMore}
-                aria-label={t.readMore}
+                className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                title={
+                  item.type === 'recommendation'
+                    ? (t.watchNow || 'View Media')
+                    : item.type === 'social'
+                    ? (t.viewPost || 'View Thread')
+                    : (t.readMore || 'Read Article')
+                }
+                aria-label={
+                  item.type === 'recommendation'
+                    ? (t.watchNow || 'View Media')
+                    : item.type === 'social'
+                    ? (t.viewPost || 'View Thread')
+                    : (t.readMore || 'Read Article')
+                }
               >
-                <ExternalLink className="h-4 w-4" />
+                <span>
+                  {item.type === 'recommendation'
+                    ? (t.watchNow || 'View Media')
+                    : item.type === 'social'
+                    ? (t.viewPost || 'View Thread')
+                    : (t.readMore || 'Read Article')}
+                </span>
+                <ExternalLink className="h-3 w-3" />
               </a>
             )}
           </div>

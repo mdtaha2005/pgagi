@@ -1,13 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserProfile } from '@/types/user';
-import { loadFromLocalStorage, saveToLocalStorage, STORAGE_KEYS } from '../localStorage';
 
 interface AuthState {
   user: UserProfile;
   isAuthenticated: boolean;
 }
 
-const defaultUser: UserProfile = {
+export const DEFAULT_USER: UserProfile = {
   id: 'usr_default_01',
   name: 'Alex Rivera',
   username: 'alexrivera',
@@ -18,7 +17,7 @@ const defaultUser: UserProfile = {
 };
 
 const initialState: AuthState = {
-  user: defaultUser,
+  user: { ...DEFAULT_USER },
   isAuthenticated: true,
 };
 
@@ -26,19 +25,16 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    hydrateProfile: (state) => {
-      const persisted = loadFromLocalStorage<Partial<UserProfile>>(STORAGE_KEYS.AUTH, {});
-      if (persisted.name) {
-        state.user = { ...state.user, ...persisted };
+    hydrateProfile: (state, action: PayloadAction<UserProfile>) => {
+      if (action.payload && action.payload.name) {
+        state.user = action.payload;
       }
     },
     updateProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
       state.user = { ...state.user, ...action.payload };
-      saveToLocalStorage(STORAGE_KEYS.AUTH, state.user);
     },
     resetProfile: (state) => {
-      state.user = defaultUser;
-      saveToLocalStorage(STORAGE_KEYS.AUTH, defaultUser);
+      state.user = { ...DEFAULT_USER };
     },
   },
 });

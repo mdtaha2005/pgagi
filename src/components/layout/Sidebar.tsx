@@ -11,7 +11,6 @@ import {
   ChevronRight,
   X,
   Layers,
-  Sparkles,
   Check,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -24,7 +23,6 @@ import {
 } from '@/store/slices/uiSlice';
 import { toggleCategory, ALL_CATEGORIES } from '@/store/slices/preferencesSlice';
 import { I18N_STRINGS } from '@/utils/formatters';
-import { ContentCategory } from '@/types/content';
 
 export function Sidebar() {
   const dispatch = useAppDispatch();

@@ -199,14 +199,14 @@ export function PreferencesModal() {
             </label>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { code: 'en', label: 'English' },
-                { code: 'es', label: 'Español' },
-                { code: 'fr', label: 'Français' },
-                { code: 'hi', label: 'हिन्दी' },
+                { code: 'en' as const, label: 'English' },
+                { code: 'es' as const, label: 'Español' },
+                { code: 'fr' as const, label: 'Français' },
+                { code: 'hi' as const, label: 'हिन्दी' },
               ].map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => dispatch(setLanguage(lang.code as any))}
+                  onClick={() => dispatch(setLanguage(lang.code))}
                   className={`rounded-xl py-2 px-3 text-xs font-semibold border transition-all ${
                     language === lang.code
                       ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'

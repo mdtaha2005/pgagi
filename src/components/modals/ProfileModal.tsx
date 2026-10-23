@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { X, User, Camera, Bookmark, Calendar, Check, Sparkles } from 'lucide-react';
+import { X, User, Calendar } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { closeProfileModal, showToast } from '@/store/slices/uiSlice';
 import { updateProfile } from '@/store/slices/authSlice';

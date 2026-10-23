@@ -48,4 +48,12 @@ describe('searchSlice Reducer', () => {
     expect(state.query).toBe('');
     expect(state.debouncedQuery).toBe('');
   });
+
+  it('should update search filter and clear history', () => {
+    let state = searchReducer(initialState, setSearchFilter('news'));
+    expect(state.selectedFilter).toBe('news');
+
+    state = searchReducer(state, clearHistory());
+    expect(state.history).toHaveLength(0);
+  });
 });

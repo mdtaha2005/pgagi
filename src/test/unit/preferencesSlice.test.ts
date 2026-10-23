@@ -24,6 +24,11 @@ describe('preferencesSlice Reducer', () => {
     expect(state.selectedCategories).toHaveLength(3);
   });
 
+  it('should set multiple selected categories', () => {
+    const state = preferencesReducer(initialPrefs, setSelectedCategories(['sports', 'health']));
+    expect(state.selectedCategories).toEqual(['sports', 'health']);
+  });
+
   it('should toggle removing an existing category', () => {
     const state = preferencesReducer(initialPrefs, toggleCategory('business'));
     expect(state.selectedCategories).not.toContain('business');

@@ -1,91 +1,127 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MOCK_CONTENT_ITEMS } from '@/data/mockData';
 import { ContentCategory, ContentItem, ContentType } from '@/types/content';
+import { FeedResponse } from '@/types/api';
+import { fetchLiveNews, fetchLiveTMDB, deduplicateContent } from '@/lib/apiClients';
+
+const VALID_CATEGORIES: ContentCategory[] = [
+  'technology',
+  'business',
+  'entertainment',
+  'sports',
+  'science',
+  'health',
+];
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const page = parseInt(searchParams.get('page') || '1', 10);
-  const limit = parseInt(searchParams.get('limit') || '12', 10);
-  const rawCategories = searchParams.get('categories');
-  const typeFilter = searchParams.get('type') as ContentType | null;
-  const query = (searchParams.get('q') || '').toLowerCase().trim();
+  try {
+    const searchParams = request.nextUrl.searchParams;
 
-  const selectedCategories: ContentCategory[] = rawCategories
-    ? (rawCategories.split(',').filter(Boolean) as ContentCategory[])
-    : ['technology', 'business', 'entertainment', 'sports', 'science', 'health'];
+    // Validate page & limit
+    const rawPage = parseInt(searchParams.get('page') || '1', 10);
+    const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
 
-  // Start with mock dataset
-  let allItems: ContentItem[] = [...MOCK_CONTENT_ITEMS];
+    const rawLimit = parseInt(searchParams.get('limit') || '12', 10);
+    const limit = isNaN(rawLimit) || rawLimit < 1 ? 12 : Math.min(rawLimit, 50);
 
-  // Optional: Attempt external NewsAPI integration if key is provided
-  const newsApiKey = process.env.NEWS_API_KEY;
-  if (newsApiKey && (!typeFilter || typeFilter === 'news')) {
-    try {
-      const topCategory = selectedCategories[0] || 'technology';
-      const newsApiUrl = `https://newsapi.org/v2/top-headlines?category=${topCategory}&pageSize=5&apiKey=${newsApiKey}`;
-      const res = await fetch(newsApiUrl, { next: { revalidate: 300 } });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.articles && Array.isArray(data.articles)) {
-          const liveNews: ContentItem[] = data.articles.map((art: any, idx: number) => ({
-            id: `live-news-${idx}-${art.publishedAt || Date.now()}`,
-            type: 'news',
-            category: topCategory,
-            title: art.title || 'Breaking News',
-            description: art.description || art.content || 'Latest development',
-            content: art.content || art.description,
-            url: art.url || 'https://news.google.com',
-            imageUrl: art.urlToImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800',
-            publishedAt: art.publishedAt || new Date().toISOString(),
-            source: { name: art.source?.name || 'NewsAPI' },
-            author: { name: art.author || art.source?.name || 'Staff' },
-            metrics: { likes: Math.floor(Math.random() * 400) + 50, views: 5000 },
-            tags: [topCategory, 'Breaking'],
-          }));
-          allItems = [...liveNews, ...allItems];
-        }
+    const rawCategories = searchParams.get('categories');
+    const typeFilter = searchParams.get('type') as ContentType | 'all' | null;
+    const query = (searchParams.get('q') || '').toLowerCase().trim();
+
+    // Parse categories
+    let selectedCategories: ContentCategory[] = VALID_CATEGORIES;
+    if (rawCategories) {
+      const parsed = rawCategories
+        .split(',')
+        .map((c) => c.trim().toLowerCase())
+        .filter((c): c is ContentCategory =>
+          VALID_CATEGORIES.includes(c as ContentCategory)
+        );
+      if (parsed.length > 0) {
+        selectedCategories = parsed;
       }
-    } catch (e) {
-      // Graceful fallback to rich mock data
     }
+
+    // Provider tracking
+    let liveNewsCount = 0;
+    let liveTmdbCount = 0;
+    const liveItems: ContentItem[] = [];
+
+    // 1. Live NewsAPI Ingestion (if key present and type allows)
+    if (!typeFilter || typeFilter === 'all' || typeFilter === 'news') {
+      const topCat = selectedCategories[0] || 'technology';
+      const newsResult = await fetchLiveNews(topCat);
+      if (newsResult && newsResult.length > 0) {
+        liveItems.push(...newsResult);
+        liveNewsCount = newsResult.length;
+      }
+    }
+
+    // 2. Live TMDB Recommendations Ingestion (if key present and entertainment/all is requested)
+    if (
+      (!typeFilter || typeFilter === 'all' || typeFilter === 'recommendation') &&
+      selectedCategories.includes('entertainment')
+    ) {
+      const tmdbResult = await fetchLiveTMDB('entertainment');
+      if (tmdbResult && tmdbResult.length > 0) {
+        liveItems.push(...tmdbResult);
+        liveTmdbCount = tmdbResult.length;
+      }
+    }
+
+    // 3. Combine with curated fallback dataset
+    const combined = deduplicateContent([...liveItems, ...MOCK_CONTENT_ITEMS]);
+
+    // 4. Filter by categories
+    let filtered = combined.filter((item) =>
+      selectedCategories.includes(item.category)
+    );
+
+    // 5. Filter by content type
+    if (typeFilter && typeFilter !== 'all' && ['news', 'recommendation', 'social'].includes(typeFilter)) {
+      filtered = filtered.filter((item) => item.type === typeFilter);
+    }
+
+    // 6. Filter by query if supplied
+    if (query) {
+      filtered = filtered.filter((item) => {
+        const titleMatch = item.title.toLowerCase().includes(query);
+        const descMatch = item.description.toLowerCase().includes(query);
+        const tagMatch = item.tags?.some((t) => t.toLowerCase().includes(query));
+        const authorMatch = item.author?.name.toLowerCase().includes(query);
+        return titleMatch || descMatch || tagMatch || authorMatch;
+      });
+    }
+
+    // 7. Sort chronologically
+    filtered.sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+
+    // 8. Pagination
+    const startIndex = (page - 1) * limit;
+    const paginatedItems = filtered.slice(startIndex, startIndex + limit);
+    const hasMore = startIndex + limit < filtered.length;
+
+    const response: FeedResponse = {
+      items: paginatedItems,
+      total: filtered.length,
+      page,
+      limit,
+      hasMore,
+      providers: {
+        news: { live: liveNewsCount > 0, count: liveNewsCount },
+        recommendations: { live: liveTmdbCount > 0, count: liveTmdbCount },
+        social: { mock: true, count: filtered.filter((i) => i.type === 'social').length },
+      },
+    };
+
+    return NextResponse.json(response);
+  } catch (err: unknown) {
+    console.error('[API /feed] Unexpected error:', err);
+    return NextResponse.json(
+      { error: 'Internal server error while fetching feed', code: 'FEED_FETCH_ERROR' },
+      { status: 500 }
+    );
   }
-
-  // Filter by category preferences
-  let filtered = allItems.filter((item) =>
-    selectedCategories.includes(item.category)
-  );
-
-  // Filter by content type if specified
-  if (typeFilter && ['news', 'recommendation', 'social'].includes(typeFilter)) {
-    filtered = filtered.filter((item) => item.type === typeFilter);
-  }
-
-  // Filter by search query if specified
-  if (query) {
-    filtered = filtered.filter((item) => {
-      const inTitle = item.title.toLowerCase().includes(query);
-      const inDesc = item.description.toLowerCase().includes(query);
-      const inTags = item.tags?.some((t) => t.toLowerCase().includes(query));
-      const inAuthor = item.author?.name.toLowerCase().includes(query);
-      return inTitle || inDesc || inTags || inAuthor;
-    });
-  }
-
-  // Sort chronologically by publishedAt descending
-  filtered.sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
-
-  // Pagination logic
-  const startIndex = (page - 1) * limit;
-  const paginatedItems = filtered.slice(startIndex, startIndex + limit);
-  const hasMore = startIndex + limit < filtered.length;
-
-  return NextResponse.json({
-    items: paginatedItems,
-    total: filtered.length,
-    page,
-    limit,
-    hasMore,
-  });
 }

@@ -7,13 +7,10 @@ import {
   X,
   Moon,
   Sun,
-  Radio,
   Menu,
   Sparkles,
   SlidersHorizontal,
-  User,
   Globe,
-  TrendingUp,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -45,16 +42,26 @@ export function Navbar() {
 
   const t = I18N_STRINGS[language] || I18N_STRINGS.en;
 
-  // 300ms debounce for search query
+  // 300ms debounce with request cancellation for search query
   useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      dispatch(clearSearch());
+      return;
+    }
+
+    let activePromise: { abort?: () => void } | null = null;
     const timer = setTimeout(() => {
-      dispatch(setDebouncedQuery(query));
-      if (query.trim()) {
-        dispatch(searchContent({ query: query.trim() }));
-      }
+      dispatch(setDebouncedQuery(trimmed));
+      activePromise = dispatch(searchContent({ query: trimmed }));
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (activePromise && typeof activePromise.abort === 'function') {
+        activePromise.abort();
+      }
+    };
   }, [query, dispatch]);
 
   // Click outside to close search preview dropdown

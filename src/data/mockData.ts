@@ -11,13 +11,19 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     content: 'Autonomous coding agents have transitioned from experimental developer tools into primary infrastructure components. Major cloud providers are standardizing agentic protocols, allowing swarms of specialized subagents to collaborate on refactoring, regression testing, and security hardening.',
     url: 'https://news.ycombinator.com',
     imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-    publishedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(), // 25 mins ago
-    source: { name: 'TechCrunch', avatarUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100' },
+    publishedAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    source: {
+      name: 'TechCrunch (Curated)',
+      avatarUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 342, views: 12400, comments: 88, rating: 4.8 },
     tags: ['AI', 'Agents', 'Enterprise', 'DevOps'],
     author: { name: 'Elena Rostova', handle: '@elena_tech', verified: true },
     isTrending: true,
     trendingRank: 1,
+    isLiked: false,
   },
   {
     id: 'rec-tech-1',
@@ -29,7 +35,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://www.themoviedb.org/tv/104877-pantheon',
     imageUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
-    source: { name: 'TMDB Recommendations' },
+    source: {
+      name: 'TMDB Picks (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 890, rating: 8.9 },
     tags: ['Sci-Fi', 'Animation', 'AI', 'Ken Liu'],
     recommendationMeta: {
@@ -42,6 +52,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     },
     isTrending: true,
     trendingRank: 4,
+    isLiked: false,
   },
   {
     id: 'social-tech-1',
@@ -52,7 +63,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://twitter.com',
     imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    source: { name: 'X / Twitter' },
+    source: {
+      name: 'X / Social (Mock)',
+      isMock: true,
+      sourceType: 'mock',
+    },
     author: {
       name: 'Dr. Aris Thorne',
       handle: '@aris_systems',
@@ -68,6 +83,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       isLiked: false,
     },
     metrics: { likes: 2950, comments: 142 },
+    isLiked: false,
   },
 
   // --- BUSINESS & FINANCE ---
@@ -81,12 +97,18 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://bloomberg.com',
     imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    source: { name: 'Bloomberg', avatarUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=100' },
+    source: {
+      name: 'Bloomberg (Curated)',
+      avatarUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=100',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 520, views: 18900, comments: 64, rating: 4.9 },
     tags: ['Semiconductors', 'Hardware', 'HardwareEcon', 'Silicon'],
     author: { name: 'Marcus Vance', handle: '@vance_markets', verified: true },
     isTrending: true,
     trendingRank: 2,
+    isLiked: false,
   },
   {
     id: 'rec-biz-1',
@@ -97,7 +119,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://goodreads.com',
     imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-    source: { name: 'Financial Times Books' },
+    source: {
+      name: 'Financial Times Books (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 740, rating: 9.2 },
     tags: ['Books', 'Geopolitics', 'BusinessStrategy', 'TechHistory'],
     recommendationMeta: {
@@ -107,6 +133,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       duration: '45 mins',
       directorOrArtist: 'Chris Miller',
     },
+    isLiked: false,
   },
   {
     id: 'social-biz-1',
@@ -117,7 +144,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://twitter.com',
     imageUrl: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 70).toISOString(),
-    source: { name: 'X / Twitter' },
+    source: {
+      name: 'X / Social (Mock)',
+      isMock: true,
+      sourceType: 'mock',
+    },
     author: {
       name: 'Sarah Lin, CFA',
       handle: '@sarahlin_vc',
@@ -133,6 +164,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       isLiked: false,
     },
     metrics: { likes: 1840, comments: 88 },
+    isLiked: false,
   },
 
   // --- ENTERTAINMENT & CINEMA ---
@@ -146,7 +178,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://www.themoviedb.org/movie/693134-dune-part-two',
     imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
-    source: { name: 'TMDB Cinephile Pick' },
+    source: {
+      name: 'TMDB Cinephile (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 4500, rating: 8.8 },
     tags: ['Sci-Fi', 'Cinema', 'IMAX', 'Villeneuve'],
     recommendationMeta: {
@@ -159,6 +195,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     },
     isTrending: true,
     trendingRank: 3,
+    isLiked: false,
   },
   {
     id: 'news-ent-1',
@@ -170,10 +207,16 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://variety.com',
     imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 110).toISOString(),
-    source: { name: 'Variety', avatarUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100' },
+    source: {
+      name: 'Variety (Curated)',
+      avatarUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 410, views: 9800, comments: 45, rating: 4.7 },
     tags: ['Cinema', 'FilmIndustry', 'Artistry', 'Hollywood'],
     author: { name: 'Julian Hayes', handle: '@j_hayes_cinema', verified: false },
+    isLiked: false,
   },
   {
     id: 'social-ent-1',
@@ -184,7 +227,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://instagram.com',
     imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    source: { name: 'Instagram Film Critic' },
+    source: {
+      name: 'Instagram (Mock)',
+      isMock: true,
+      sourceType: 'mock',
+    },
     author: {
       name: 'Maya Soundtrack Lab',
       handle: '@soundtrack_breakdown',
@@ -197,9 +244,10 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       repliesCount: 94,
       retweetsCount: 420,
       likesCount: 5120,
-      isLiked: true,
+      isLiked: false,
     },
     metrics: { likes: 5120, comments: 94 },
+    isLiked: false,
   },
 
   // --- SPORTS ---
@@ -213,12 +261,17 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://bbc.com/sport',
     imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 50).toISOString(),
-    source: { name: 'BBC Sport' },
+    source: {
+      name: 'BBC Sport (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 1120, views: 32000, comments: 210, rating: 4.9 },
     tags: ['Football', 'ChampionsLeague', 'Tactics', 'SportsScience'],
     author: { name: 'David Fletcher', handle: '@fletcher_footy', verified: true },
     isTrending: true,
     trendingRank: 5,
+    isLiked: false,
   },
   {
     id: 'rec-sport-1',
@@ -229,7 +282,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://netflix.com',
     imageUrl: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 16).toISOString(),
-    source: { name: 'DocuSeries Top Pick' },
+    source: {
+      name: 'DocuSeries Top Pick (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 1890, rating: 8.6 },
     tags: ['Motorsport', 'F1', 'Telemetry', 'Documentary'],
     recommendationMeta: {
@@ -239,6 +296,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       duration: '10 Episodes',
       directorOrArtist: 'Box to Box Films',
     },
+    isLiked: false,
   },
   {
     id: 'social-sport-1',
@@ -249,7 +307,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://twitter.com',
     imageUrl: 'https://images.unsplash.com/photo-1532974297617-c0f05fe47bff?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
-    source: { name: 'X / Twitter' },
+    source: {
+      name: 'X / Social (Mock)',
+      isMock: true,
+      sourceType: 'mock',
+    },
     author: {
       name: 'Apex Analytics F1',
       handle: '@apex_telemetry',
@@ -265,6 +327,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       isLiked: false,
     },
     metrics: { likes: 2100, comments: 65 },
+    isLiked: false,
   },
 
   // --- SCIENCE ---
@@ -278,12 +341,17 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://nature.com',
     imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 80).toISOString(),
-    source: { name: 'Nature Astronomy' },
+    source: {
+      name: 'Nature Astronomy (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 2890, views: 45000, comments: 340, rating: 5.0 },
     tags: ['Astronomy', 'JWST', 'Exoplanets', 'Astrobiology'],
     author: { name: 'Dr. Clara Higgins', handle: '@clara_astrophysics', verified: true },
     isTrending: true,
     trendingRank: 6,
+    isLiked: false,
   },
   {
     id: 'rec-sci-1',
@@ -294,7 +362,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://spotify.com',
     imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
-    source: { name: 'Spotify Science & Health' },
+    source: {
+      name: 'Spotify Science & Health (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 3200, rating: 9.4 },
     tags: ['Neuroscience', 'Podcast', 'Biology', 'Focus'],
     recommendationMeta: {
@@ -304,6 +376,7 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       duration: '1h 55m',
       directorOrArtist: 'Dr. Andrew Huberman',
     },
+    isLiked: false,
   },
 
   // --- HEALTH & WELLNESS ---
@@ -317,10 +390,15 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://cell.com',
     imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 95).toISOString(),
-    source: { name: 'Cell Metabolism' },
+    source: {
+      name: 'Cell Metabolism (Curated)',
+      isMock: true,
+      sourceType: 'curated',
+    },
     metrics: { likes: 1450, views: 24000, comments: 112, rating: 4.9 },
     tags: ['Biotech', 'Genetics', 'Longevity', 'CRISPR'],
     author: { name: 'Dr. Tariq Mansoor', handle: '@tariq_biotech', verified: true },
+    isLiked: false,
   },
   {
     id: 'social-health-1',
@@ -331,7 +409,11 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
     url: 'https://twitter.com',
     imageUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&auto=format&fit=crop&q=80',
     publishedAt: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
-    source: { name: 'X / Twitter' },
+    source: {
+      name: 'X / Social (Mock)',
+      isMock: true,
+      sourceType: 'mock',
+    },
     author: {
       name: 'Dr. Gabrielle Moss',
       handle: '@gabriellemoss_md',
@@ -347,5 +429,6 @@ export const MOCK_CONTENT_ITEMS: ContentItem[] = [
       isLiked: false,
     },
     metrics: { likes: 3890, comments: 118 },
+    isLiked: false,
   },
 ];

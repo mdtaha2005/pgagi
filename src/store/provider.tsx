@@ -9,24 +9,91 @@ import { hydrateCustomOrder, prependLiveItem } from './slices/feedSlice';
 import { hydrateTheme, showToast } from './slices/uiSlice';
 import { hydrateProfile } from './slices/authSlice';
 import { useAppDispatch, useAppSelector } from './hooks';
+import {
+  STORAGE_KEYS,
+  loadFromLocalStorage,
+  validatePreferences,
+  validateFavorites,
+  validateTheme,
+  validateFeedOrder,
+  validateProfile,
+  DEFAULT_PREFERENCES,
+} from './localStorage';
+import { DEFAULT_USER } from './slices/authSlice';
 import { ContentItem } from '@/types/content';
 
 function HydrationAndLiveSync({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.ui.theme);
   const { realTimeEnabled, realTimeIntervalSeconds, selectedCategories } = useAppSelector(
     (state) => state.preferences
   );
   const liveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 1. Client-side Hydration with safe schema validation
   useEffect(() => {
-    dispatch(hydratePreferences());
-    dispatch(hydrateFavorites());
-    dispatch(hydrateCustomOrder());
-    dispatch(hydrateTheme());
-    dispatch(hydrateProfile());
+    // Preferences
+    const validPrefs = loadFromLocalStorage(
+      STORAGE_KEYS.PREFERENCES,
+      validatePreferences,
+      DEFAULT_PREFERENCES
+    );
+    dispatch(hydratePreferences(validPrefs));
+
+    // Favorites
+    const validFavs = loadFromLocalStorage(
+      STORAGE_KEYS.FAVORITES,
+      validateFavorites,
+      []
+    );
+    dispatch(hydrateFavorites(validFavs));
+
+    // Theme
+    const validTheme = loadFromLocalStorage(
+      STORAGE_KEYS.THEME,
+      validateTheme,
+      'dark'
+    );
+    dispatch(hydrateTheme(validTheme));
+
+    // Feed order
+    const validOrder = loadFromLocalStorage(
+      STORAGE_KEYS.FEED_ORDER,
+      validateFeedOrder,
+      []
+    );
+    dispatch(hydrateCustomOrder(validOrder));
+
+    // Profile
+    const validProfile = loadFromLocalStorage(
+      STORAGE_KEYS.AUTH,
+      (raw) => validateProfile(raw, DEFAULT_USER),
+      DEFAULT_USER
+    );
+    dispatch(hydrateProfile(validProfile));
   }, [dispatch]);
 
-  // Real-time live feed polling simulation
+  // 2. Client-side Theme DOM effect (completely pure separation from reducers)
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else if (theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // System
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+  }, [theme]);
+
+  // 3. Real-time live feed polling simulation
   useEffect(() => {
     if (!realTimeEnabled) {
       if (liveTimerRef.current) clearInterval(liveTimerRef.current);
@@ -42,10 +109,10 @@ function HydrationAndLiveSync({ children }: { children: React.ReactNode }) {
         if (res.ok) {
           const item: ContentItem = await res.json();
           dispatch(prependLiveItem(item));
-          dispatch(showToast(`⚡ Breaking: ${item.title.slice(0, 48)}...`));
+          dispatch(showToast(`⚡ Live update: ${item.title.slice(0, 48)}...`));
         }
-      } catch (e) {
-        // quiet fallback
+      } catch {
+        // Quiet fallback
       }
     };
 

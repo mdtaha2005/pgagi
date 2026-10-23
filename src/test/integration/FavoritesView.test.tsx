@@ -14,7 +14,7 @@ import { ContentItem } from '@/types/content';
 // Mock next/image
 vi.mock('next/image', () => ({
   __esModule: true,
-  default: (props: any) => {
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
     // eslint-disable-next-line @next/next/no-img-element
     return <img {...props} alt={props.alt || 'mocked image'} />;
   },

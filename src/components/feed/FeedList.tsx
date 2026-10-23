@@ -3,8 +3,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Reorder, useDragControls } from 'framer-motion';
 import {
-  Compass,
-  Filter,
   RotateCcw,
   Sparkles,
   ArrowDownCircle,
@@ -221,11 +219,28 @@ export function FeedList() {
         </div>
       )}
 
-      {/* Error Banner */}
+      {/* Error Banner with Retry */}
       {status === 'failed' && (
-        <div className="flex items-center gap-3 rounded-2xl border border-rose-500/30 bg-rose-50 dark:bg-rose-950/30 p-4 text-xs text-rose-600 dark:text-rose-400">
-          <AlertCircle className="h-5 w-5 flex-shrink-0" />
-          <p>{error || 'Failed to load content. Please refresh.'}</p>
+        <div className="flex items-center justify-between rounded-2xl border border-rose-500/30 bg-rose-50 dark:bg-rose-950/30 p-4 text-xs text-rose-600 dark:text-rose-400">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            <p>{error || 'Failed to load content. Please refresh.'}</p>
+          </div>
+          <button
+            onClick={() =>
+              dispatch(
+                fetchUnifiedFeed({
+                  page: 1,
+                  categories: selectedCategories,
+                  filter: activeFilter,
+                  reset: true,
+                })
+              )
+            }
+            className="rounded-lg bg-rose-600 hover:bg-rose-700 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all"
+          >
+            Retry
+          </button>
         </div>
       )}
 
