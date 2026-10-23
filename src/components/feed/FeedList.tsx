@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Reorder } from 'framer-motion';
+import { Reorder, useDragControls } from 'framer-motion';
 import {
   Compass,
   Filter,
@@ -23,6 +23,22 @@ import { openPreferencesModal } from '@/store/slices/uiSlice';
 import { ContentCard } from './ContentCard';
 import { ContentItem, ContentType } from '@/types/content';
 import { I18N_STRINGS } from '@/utils/formatters';
+
+function ReorderableFeedItem({ item }: { item: ContentItem }) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={item}
+      dragListener={false}
+      dragControls={dragControls}
+      className="list-none"
+      whileDrag={{ scale: 1.02, zIndex: 50 }}
+    >
+      <ContentCard item={item} dragControls={dragControls} />
+    </Reorder.Item>
+  );
+}
 
 export function FeedList() {
   const dispatch = useAppDispatch();
@@ -90,7 +106,7 @@ export function FeedList() {
   return (
     <div className="space-y-6">
       {/* Top Banner / Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-4 sm:p-5 backdrop-blur-md shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#111827]/70 p-5 backdrop-blur-md shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
@@ -125,7 +141,7 @@ export function FeedList() {
               onClick={() => handleFilterChange(tab.id)}
               className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all whitespace-nowrap ${
                 activeFilter === tab.id
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
@@ -158,23 +174,16 @@ export function FeedList() {
           axis="y"
           values={displayItems}
           onReorder={handleReorder}
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 list-none p-0 m-0"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 list-none p-0 m-0"
         >
           {displayItems.map((item) => (
-            <Reorder.Item
-              key={item.id}
-              value={item}
-              className="list-none"
-              whileDrag={{ scale: 1.03, zIndex: 50 }}
-            >
-              <ContentCard item={item} />
-            </Reorder.Item>
+            <ReorderableFeedItem key={item.id} item={item} />
           ))}
         </Reorder.Group>
       ) : status === 'loading' ? null : (
         /* Empty State */
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-12 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 mb-4">
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 p-16 text-center bg-white/40 dark:bg-[#111827]/40">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 mb-4 shadow-sm">
             <Layers className="h-7 w-7" />
           </div>
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
@@ -185,7 +194,7 @@ export function FeedList() {
           </p>
           <button
             onClick={() => dispatch(openPreferencesModal())}
-            className="mt-4 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-600/30 hover:bg-indigo-700"
+            className="mt-4 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-600/30 hover:bg-indigo-700 transition-all hover:scale-105"
           >
             Configure Preferences
           </button>
@@ -194,13 +203,13 @@ export function FeedList() {
 
       {/* Loading Skeletons */}
       {status === 'loading' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[1, 2, 3].map((n) => (
             <div
               key={n}
-              className="h-80 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 animate-pulse p-4 flex flex-col justify-between"
+              className="h-80 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] animate-pulse p-4 flex flex-col justify-between"
             >
-              <div className="h-40 rounded-xl bg-slate-200 dark:bg-slate-800 w-full" />
+              <div className="h-44 rounded-xl bg-slate-200 dark:bg-slate-800 w-full" />
               <div className="space-y-2 mt-4">
                 <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
                 <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-full" />

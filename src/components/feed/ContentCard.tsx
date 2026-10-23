@@ -29,11 +29,17 @@ import {
 
 interface ContentCardProps {
   item: ContentItem;
+  dragControls?: any;
   dragHandleProps?: Record<string, any>;
   isDragging?: boolean;
 }
 
-export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardProps) {
+export function ContentCard({
+  item,
+  dragControls,
+  dragHandleProps,
+  isDragging,
+}: ContentCardProps) {
   const dispatch = useAppDispatch();
   const favorites = useAppSelector((state) => state.favorites.items);
   const { density, language } = useAppSelector((state) => state.preferences);
@@ -78,12 +84,12 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
   return (
     <article
       onClick={handleOpenDetail}
-      className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-200 cursor-pointer overflow-hidden ${
+      className={`group relative flex flex-col justify-between rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden ${
         isDragging
-          ? 'shadow-2xl scale-[1.02] border-indigo-500 ring-2 ring-indigo-500/20 bg-slate-900/90 z-50'
-          : 'bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/40 hover:shadow-lg dark:hover:shadow-indigo-500/5'
+          ? 'shadow-2xl scale-[1.02] border-indigo-500 ring-2 ring-indigo-500/30 bg-slate-900 z-50'
+          : 'bg-white dark:bg-[#111827] border-slate-200/90 dark:border-slate-800/90 hover:border-indigo-500/50 hover:shadow-xl dark:hover:shadow-indigo-500/10 hover:-translate-y-0.5'
       }`}
-      style={{ minHeight: isCompact ? '280px' : '360px' }}
+      style={{ minHeight: isCompact ? '280px' : '370px' }}
       aria-label={item.title}
     >
       {/* Top Banner & Image */}
@@ -94,12 +100,13 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
               src={item.imageUrl}
               alt={item.title}
               fill
+              unoptimized
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-900/30 to-purple-900/30 text-slate-400">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 text-slate-400">
               <Sparkles className="h-8 w-8 text-indigo-400" />
             </div>
           )}
@@ -107,11 +114,16 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-          {/* Drag Handle */}
+          {/* Drag Handle with pointer controls */}
           <div
             {...dragHandleProps}
+            onPointerDown={(e) => {
+              if (dragControls) {
+                dragControls.start(e);
+              }
+            }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute left-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-black/50 text-white/80 backdrop-blur-md opacity-70 transition-opacity hover:opacity-100 cursor-grab active:cursor-grabbing hover:bg-black/70"
+            className="absolute left-2.5 top-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-lg bg-black/60 text-white/80 backdrop-blur-md opacity-70 transition-all hover:opacity-100 hover:scale-105 cursor-grab active:cursor-grabbing hover:bg-black/80 shadow-md"
             title="Drag to reorder card"
             aria-label="Drag card to reorder"
           >
@@ -119,27 +131,27 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
           </div>
 
           {/* Badges on Top Right */}
-          <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5">
+          <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5 z-10">
             {item.trendingRank && (
-              <span className="flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
+              <span className="flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
                 🔥 #{item.trendingRank}
               </span>
             )}
             <span
-              className={`rounded-full border px-2 py-0.5 text-xs font-semibold backdrop-blur-md ${typeStyle.badge}`}
+              className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-md ${typeStyle.badge}`}
             >
               {typeStyle.label}
             </span>
           </div>
 
           {/* Category & Time at bottom of image */}
-          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-xs text-white/90">
+          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-xs text-white/90 z-10">
             <span
-              className={`rounded-md border px-2 py-0.5 font-medium capitalize backdrop-blur-md ${categoryStyle.bg} ${categoryStyle.text} ${categoryStyle.border}`}
+              className={`rounded-md border px-2.5 py-0.5 font-medium capitalize backdrop-blur-md shadow-sm ${categoryStyle.bg} ${categoryStyle.text} ${categoryStyle.border}`}
             >
               {item.category}
             </span>
-            <span className="flex items-center gap-1 text-slate-200">
+            <span className="flex items-center gap-1 text-slate-200 drop-shadow">
               <Clock className="h-3 w-3" />
               {formatRelativeTime(item.publishedAt)}
             </span>
@@ -179,6 +191,7 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
                     src={item.author.avatarUrl}
                     alt={item.author.name}
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>
@@ -223,7 +236,7 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
               {item.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400"
+                  className="rounded-md bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400"
                 >
                   #{tag}
                 </span>
@@ -235,7 +248,7 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
         {/* Footer Actions */}
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-3">
           {/* Source / Publisher */}
-          <span className="truncate text-xs font-medium text-slate-500 dark:text-slate-400 max-w-[120px]">
+          <span className="truncate text-xs font-semibold text-slate-500 dark:text-slate-400 max-w-[120px]">
             {item.source.name}
           </span>
 
@@ -254,7 +267,7 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
                     : 'text-slate-400 hover:text-rose-500'
                 }`}
               />
-              <span>
+              <span className="font-medium">
                 {item.socialMeta?.likesCount ?? item.metrics?.likes ?? 0}
               </span>
             </button>
@@ -276,9 +289,9 @@ export function ContentCard({ item, dragHandleProps, isDragging }: ContentCardPr
             {/* Bookmark Favorite */}
             <button
               onClick={handleToggleFavorite}
-              className={`rounded-lg p-1.5 transition-colors ${
+              className={`rounded-lg p-1.5 transition-all ${
                 isFavorite
-                  ? 'bg-amber-500/10 text-amber-500 dark:bg-amber-500/20'
+                  ? 'bg-amber-500/15 text-amber-500 dark:bg-amber-500/20'
                   : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-amber-500'
               }`}
               title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}

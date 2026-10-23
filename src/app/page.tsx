@@ -12,13 +12,13 @@ export default function DashboardPage() {
   const activeSection = useAppSelector((state) => state.ui.activeSection);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 transition-colors">
       <Navbar />
 
-      <div className="flex flex-1 mx-auto w-full max-w-7xl">
+      <div className="flex flex-1 w-full">
         <Sidebar />
 
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           {activeSection === 'feed' && <FeedList />}
           {activeSection === 'trending' && <TrendingView />}
           {activeSection === 'favorites' && <FavoritesView />}

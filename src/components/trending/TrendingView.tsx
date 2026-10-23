@@ -89,16 +89,16 @@ export function TrendingView() {
 
       {/* Grid of Trending Cards */}
       {status === 'loading' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <div
               key={n}
-              className="h-80 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 animate-pulse p-4"
+              className="h-80 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] animate-pulse p-4"
             />
           ))}
         </div>
       ) : items.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {items.map((item) => (
             <ContentCard key={item.id} item={item} />
           ))}

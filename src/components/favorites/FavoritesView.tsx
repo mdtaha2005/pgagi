@@ -145,7 +145,7 @@ export function FavoritesView() {
 
       {/* Grid of Favorites */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((item) => (
             <ContentCard key={item.id} item={item} />
           ))}
